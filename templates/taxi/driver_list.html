@@ -3,10 +3,17 @@
 {% block content %}
     <h1>
       Driver List
-      <a class="btn btn-success float-right" href="{% url 'taxi:driver-create' %}" role="button">
+        <a class="btn btn-success float-right" href="{% url 'taxi:driver-create' %}" role="button">
         Add
       </a>
     </h1>
+
+    <form action="{% url 'taxi:drivers-search-results' %}" method="get">
+        <label> Search by Name, Surname, Nickname
+            <input name="q" type="text" placeholder="Search driver...">
+            <input class="btn btn-primary" type="submit" value="Find">
+        </label>
+    </form>
 
     {% if driver_list %}
     <table class="table">
@@ -26,7 +33,6 @@
         <td>{{ driver.license_number }}</td>
       </tr>
     {% endfor %}
-
     </table>
     {% else %}
       <p>There are no drivers in the service.</p>

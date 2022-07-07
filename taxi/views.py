@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -34,12 +35,12 @@ class ManufacturerListView(LoginRequiredMixin, generic.ListView):
     model = Manufacturer
     context_object_name = "manufacturer_list"
     template_name = "taxi/manufacturer_list.html"
-    paginate_by = 2
+    paginate_by = 10
 
 
 class CarListView(LoginRequiredMixin, generic.ListView):
     model = Car
-    paginate_by = 2
+    paginate_by = 10
     queryset = Car.objects.all().select_related("manufacturer")
 
 
@@ -49,7 +50,7 @@ class CarDetailView(LoginRequiredMixin, generic.DetailView):
 
 class DriverListView(LoginRequiredMixin, generic.ListView):
     model = Driver
-    paginate_by = 2
+    paginate_by = 10
 
 
 class DriverDetailView(LoginRequiredMixin, generic.DetailView):
@@ -115,3 +116,16 @@ class DriverLicenseUpdateView(LoginRequiredMixin, generic.UpdateView):
 class DriverDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Driver
     success_url = reverse_lazy("taxi:driver-list")
+
+
+class SearchResultsView(LoginRequiredMixin, generic.ListView):
+    model = Driver
+    template_name = 'taxi/driver_search_results.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+        return Driver.objects.filter(
+            Q(first_name__icontains=query)
+            | Q(last_name__icontains=query)
+            | Q(username__icontains=query)
+        )
